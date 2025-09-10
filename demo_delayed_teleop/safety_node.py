@@ -13,7 +13,7 @@ class SafetyNode(Node):
 
         # Publishers
         self.pub_user = self.create_publisher(Twist, '/cmd_vel_user', 10) 
-        self.pub_direct = self.create_publisher(Twist, '/fleet_0/cmd_vel', 10)      # real robot command topic
+        self.pub_direct = self.create_publisher(Twist, '/cmd_vel', 10)      # real robot command topic
 
         # Subscribers
         self.create_subscription(Twist, '/cmd_vel_out', self.delayed_callback, 10)  # delayed command topic (from delay_node)
@@ -25,10 +25,10 @@ class SafetyNode(Node):
     def user_callback(self, msg):
         if not self.override:
             twist = Twist()
-            twist.header.stamp = self.get_clock().now().to_msg()
+            #twist.header.stamp = self.get_clock().now().to_msg()
             if len(msg.axes) >= 2:
-                twist.twist.linear.x = msg.axes[1]
-                twist.twist.angular.z = msg.axes[0]
+                twist.linear.x = msg.axes[1]
+                twist.angular.z = msg.axes[0]
             self.pub_user.publish(twist)
 
     def delayed_callback(self, msg):

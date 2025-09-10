@@ -20,6 +20,7 @@ ament_python_install_package(${PROJECT_NAME})
 # Installer les scripts Python exécutables
 install(PROGRAMS
   ${PROJECT_NAME}/safety_node.py
+  ${PROJECT_NAME}/color_detector.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

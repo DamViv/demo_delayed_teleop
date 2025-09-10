@@ -14,7 +14,8 @@ setup(
     license='Apache-2.0',
     entry_points={
         'console_scripts': [
-            'safety_node = demo_delayed_teleop.safety_node:main'  # chemin complet vers le module
+            'safety_node = demo_delayed_teleop.safety_node:main',
+            'color_detector = demo_delayed_teleop.color_detector:main',
         ],
     },
 )

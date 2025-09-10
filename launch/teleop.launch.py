@@ -19,6 +19,12 @@ def generate_launch_description():
             executable='safety_node.py',
             name='safety_node'
         ),
+        # Color detector node Python
+        Node(
+            package='demo_delayed_teleop',
+            executable='color_detector.py',
+            name='color_detector'
+        ),
         # joy_node utilisateur
         Node(
             package='joy',
