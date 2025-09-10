@@ -15,6 +15,15 @@ class ColorDetector(Node):
             '/fleet_0/camera/image',   # adapte le topic à ta caméra
             self.listener_callback,
             10)
+        
+
+        # Publisher pour l'image grise + détection
+        self.publisher_ = self.create_publisher(
+            Image,
+            'image_grey_with_detection',
+            10
+        )
+
         self.bridge = CvBridge()
 
         # Crée une fenêtre avec sliders
@@ -69,14 +78,20 @@ class ColorDetector(Node):
             mask = cv2.bitwise_or(mask1, mask2)
 
         # Trouver les contours
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > 500:  # filtre pour ignorer les petits bruits
                 x, y, w, h = cv2.boundingRect(cnt)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)  # vert
                 cv2.putText(frame, f"Area: {area}", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1)
 
+                cv2.rectangle(gray_bgr, (x, y), (x + w, y + h), (0, 0, 255), 2)  # rouge
+                cv2.putText(gray_bgr, f"Area: {area}", (x, y-5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
 
 
         result = cv2.bitwise_and(frame, frame, mask=mask)
@@ -85,8 +100,12 @@ class ColorDetector(Node):
         cv2.imshow("Camera", frame)
         cv2.imshow("Mask", mask)
         cv2.imshow("Detection", result)
+        cv2.imshow("Detection Gray + Boxes", gray_bgr)
         cv2.waitKey(1)
 
+        # Publication ROS2
+        msg_out = self.bridge.cv2_to_imgmsg(gray_bgr, encoding="bgr8")
+        self.publisher_.publish(msg_out)
 
 def main(args=None):
     rclpy.init(args=args)
